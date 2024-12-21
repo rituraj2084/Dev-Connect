@@ -1,0 +1,24 @@
+{
+  "name": "devconnect",
+  "version": "1.0.0",
+  "description": "Web app for finding developer partner",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "Dev-Connect",
+    "Node",
+    "Dev-Tinder"
+  ],
+  "author": "Ritu Raj",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.9.0",
+    "validator": "^13.12.0"
+  }
+}
