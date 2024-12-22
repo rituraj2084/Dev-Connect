@@ -1,11 +1,17 @@
 const express = require('express');
 const app = express();
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const env = require('dotenv');
+env.config();
 const connectDB = require('./config/database');
 const User = require('./models/user');
 const { validateSignUpData } = require('./utils/validation');
+const { adminAuth } = require('./middlewares/auth');
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post('/signup', async (req, res) => {
   try {
@@ -36,13 +42,34 @@ app.post('/login', async (req, res) => {
     if (!isPasswordValid) {
       throw new Error('Invalid credentials');
     }
+    const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+    res.cookie('token', token);
     res.send('Login successful!!');
   } catch (err) {
     res.status(400).send('ERROR: ' + err.message);
   }
 });
 
-app.get('/user', async (req, res) => {
+app.get('/profile', adminAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user);
+  } catch (err) {
+    res.status(400).send('ERROR: ' + err.message);
+  }
+});
+
+app.get('/send-connection-request', adminAuth, async (req, res) => {
+  try {
+    res.send('Connection sent!!');
+  } catch (error) {
+    res.status(400).send('ERROR: ' + error.message);
+  }
+});
+
+app.get('/user', adminAuth, async (req, res) => {
   try {
     const userEmail = req.body.email;
     const user = await User.find({ email: userEmail });
@@ -56,7 +83,7 @@ app.get('/user', async (req, res) => {
   }
 });
 
-app.get('/feed', async (req, res) => {
+app.get('/feed', adminAuth, async (req, res) => {
   try {
     const users = await User.find({});
     if (!users.length) {
@@ -69,7 +96,7 @@ app.get('/feed', async (req, res) => {
   }
 });
 
-app.delete('/user', async (req, res) => {
+app.delete('/user', adminAuth, async (req, res) => {
   const userId = req.body._id;
   try {
     await User.findByIdAndDelete(userId);
@@ -79,7 +106,7 @@ app.delete('/user', async (req, res) => {
   }
 });
 
-app.patch('/user/:userId', async (req, res) => {
+app.patch('/user/:userId', adminAuth, async (req, res) => {
   const userId = req.params.userId;
   const data = req.body;
   try {
@@ -87,7 +114,6 @@ app.patch('/user/:userId', async (req, res) => {
     const isUpdateAllowed = Object.keys(data).every((key) =>
       ALLOWED_UPDATES.includes(key)
     );
-    console.log(isUpdateAllowed);
     if (!isUpdateAllowed) {
       throw new Error('Update not allowed');
     }
@@ -108,6 +134,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log('Database could not be connected!');
-    console.error(err);
+    console.log('Database could not be connected!', err.message);
   });
