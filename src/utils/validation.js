@@ -30,7 +30,6 @@ const validateEditData = (req) => {
 const validatePassword = async (req) => {
   const { password } = req.body;
   const isPasswordValid = validator.isStrongPassword(password);
-  console.log(isPasswordValid);
   return isPasswordValid;
 };
 module.exports = { validateSignUpData, validateEditData, validatePassword };
