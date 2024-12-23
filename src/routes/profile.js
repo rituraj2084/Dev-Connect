@@ -1,7 +1,8 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const profileRouter = express.Router();
 const { adminAuth } = require('../middlewares/auth');
-const { validateEditData } = require('../utils/validation');
+const { validateEditData, validatePassword } = require('../utils/validation');
 
 profileRouter.get('/profile/view', adminAuth, async (req, res) => {
   try {
@@ -22,6 +23,23 @@ profileRouter.patch('/profile/edit', adminAuth, async (req, res) => {
     await loggedInUser.save();
     res.json({
       message: `${loggedInUser.firstName}, Your profile updated successfully`,
+      data: loggedInUser,
+    });
+  } catch (err) {
+    res.status(400).send('ERROR: ' + err.message);
+  }
+});
+
+profileRouter.patch('/profile/password', adminAuth, async (req, res) => {
+  try {
+    if (!validatePassword(req)) {
+      throw new Error('Please enter strong password!');
+    }
+    const loggedInUser = req.user;
+    loggedInUser.password = await bcrypt.hash(req.body.password, 10);
+    await loggedInUser.save();
+    res.json({
+      message: `${loggedInUser.firstName}, your password updated successfully!`,
       data: loggedInUser,
     });
   } catch (err) {

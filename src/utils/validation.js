@@ -26,4 +26,11 @@ const validateEditData = (req) => {
   );
   return isEditAllowed;
 };
-module.exports = { validateSignUpData, validateEditData };
+
+const validatePassword = async (req) => {
+  const { password } = req.body;
+  const isPasswordValid = validator.isStrongPassword(password);
+  console.log(isPasswordValid);
+  return isPasswordValid;
+};
+module.exports = { validateSignUpData, validateEditData, validatePassword };
