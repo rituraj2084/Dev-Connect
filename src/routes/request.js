@@ -28,12 +28,12 @@ requestRouter.post(
         ],
       });
       if (existingConnectionRequest) {
-        return res.status(400).send({ message: `Invalid request!` });
+        return res.status(400).send({ message: `Request already sent!` });
       }
 
       const toUser = await User.findById(toUserId);
       if (!toUser) {
-        return res.status(400).send({ message: `User not found!` });
+        return res.status(404).send({ message: `User not found!` });
       }
       const data = new ConnectionRequest({
         fromUserId,
@@ -47,6 +47,40 @@ requestRouter.post(
         message: `${req.user.firstName} ${status} ${toUser.firstName}`,
         data,
       });
+    } catch (error) {
+      res.status(400).send('ERROR: ' + error.message);
+    }
+  }
+);
+
+requestRouter.post(
+  '/request/review/:status/:requestId',
+  adminAuth,
+  async (req, res) => {
+    try {
+      const { requestId, status } = req.params;
+      const loggedInUser = req.user;
+      const allowedStatus = ['accepted', 'rejected'];
+      // console.log(loggedInUser);
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: 'Inavalid status type: ' + status });
+      }
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: 'interested',
+      });
+      console.log(connectionRequest);
+      if (!connectionRequest) {
+        return res
+          .status(404)
+          .json({ message: 'Connection request not found!' });
+      }
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+      res.json({ message: 'Connection request ' + status, data });
     } catch (error) {
       res.status(400).send('ERROR: ' + error.message);
     }
