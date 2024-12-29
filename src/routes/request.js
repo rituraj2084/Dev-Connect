@@ -31,11 +31,6 @@ requestRouter.post(
         return res.status(400).send({ message: `Invalid request!` });
       }
 
-      if (new mongoose.Types.ObjectId(toUserId).equals(fromUserId)) {
-        return res
-          .status(400)
-          .send({ message: `Can't send connection request to self!` });
-      }
       const toUser = await User.findById(toUserId);
       if (!toUser) {
         return res.status(400).send({ message: `User not found!` });
