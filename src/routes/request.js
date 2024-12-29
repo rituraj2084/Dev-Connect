@@ -44,7 +44,7 @@ requestRouter.post(
       await data.save();
 
       res.json({
-        message: `Connection request has been sent successfully!`,
+        message: `${req.user.firstName} ${status} ${toUser.firstName}`,
         data,
       });
     } catch (error) {
