@@ -1,6 +1,7 @@
 const express = require('express');
 const { adminAuth } = require('../middlewares/auth');
 const ConnectionRequest = require('../models/connectionRequest');
+const User = require('../models/user');
 const userRouter = express.Router();
 
 const USER_SAFE_DATA = 'firstName lastName photoUrl age gender about skills';
@@ -44,6 +45,31 @@ userRouter.get('/user/connections', adminAuth, async (req, res) => {
       message: 'Data fetched successfully!',
       data,
     });
+  } catch (error) {
+    res.status(400).send('ERROR: ' + error.message);
+  }
+});
+
+userRouter.get('/feed', adminAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select('fromUserId toUserId');
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select(USER_SAFE_DATA);
+    res.send(users);
   } catch (error) {
     res.status(400).send('ERROR: ' + error.message);
   }
