@@ -64,12 +64,17 @@ const EditProfile = ({ user }) => {
               <div className="label">
                 <span className="label-text">Gender</span>
               </div>
-              <input
-                type="text"
-                value={gender}
-                className="input input-bordered input-primary w-full max-w-xs"
+              <select
+                className="select select-bordered w-full max-w-xs"
                 onChange={(e) => setGender(e.target.value)}
-              />
+              >
+                <option disabled selected>
+                  Gender
+                </option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Others">Others</option>
+              </select>
             </label>
             <label className="form-control w-full max-w-xs my-1">
               <div className="label">
