@@ -17,6 +17,9 @@ const Navbar = () => {
       console.error(error);
     }
   };
+  const handleConnections = () => {
+    navigate('/connections');
+  };
   return (
     <div className="navbar bg-base-300">
       <div className="flex-1">
@@ -44,11 +47,12 @@ const Navbar = () => {
               <li>
                 <Link to="/profile" className="justify-between">
                   Profile
-                  <span className="badge">New</span>
                 </Link>
               </li>
               <li>
-                <Link>Settings</Link>
+                <Link to="/connections" onClick={handleConnections}>
+                  Connections
+                </Link>
               </li>
               <li>
                 <Link to="/login" onClick={handleLogout}>

@@ -20,7 +20,7 @@ const EditProfile = ({ user }) => {
     try {
       const res = await axios.patch(
         BASE_URL + '/profile/edit',
-        { firstName, lastName, photoUrl, about, gender, age, about },
+        { firstName, lastName, photoUrl, about, gender, age },
         { withCredentials: true }
       );
       dispatch(addUser(res?.data?.data));
@@ -65,12 +65,9 @@ const EditProfile = ({ user }) => {
                 <span className="label-text">Gender</span>
               </div>
               <select
-                className="select select-bordered w-full max-w-xs"
+                className="select select-primary w-full max-w-xs"
                 onChange={(e) => setGender(e.target.value)}
               >
-                <option disabled selected>
-                  Gender
-                </option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Others">Others</option>
@@ -104,7 +101,7 @@ const EditProfile = ({ user }) => {
                 <span className="label-text">About</span>
               </div>
               <textarea
-                className="textarea textarea-bordered"
+                className="textarea textarea-primary"
                 value={about}
                 onChange={(e) => setAbout(e.target.value)}
               ></textarea>
