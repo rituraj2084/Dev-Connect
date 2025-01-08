@@ -2,35 +2,33 @@ import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addConnections } from '../utils/connectionsSlice';
+import { addRequests } from '../utils/requestsSlice';
 
-const Connections = () => {
+const Requests = () => {
   const dispatch = useDispatch();
-  const connections = useSelector((store) => store.connections);
-  const fetchConnections = async () => {
-    const res = await axios.get(BASE_URL + '/user/connections', {
+  const requests = useSelector((store) => store.requests);
+  const fetchRequests = async () => {
+    const res = await axios.get(BASE_URL + '/user/requests/received', {
       withCredentials: true,
     });
-    dispatch(addConnections(res?.data?.data));
+    dispatch(addRequests(res?.data?.data));
   };
-
   useEffect(() => {
-    fetchConnections();
+    fetchRequests();
   }, []);
-
-  if (!connections) return;
-  if (connections.length == 0) return <div>No connections found!!</div>;
+  if (!requests) return;
+  if (requests.length == 0) return <div>No requests found!!</div>;
 
   return (
     <div className="flex flex-col items-center my-10">
-      <h1 className="font-bold text-white text-3xl">Connections</h1>
-      {connections.map((connection) => {
+      <h1 className="font-bold text-white text-3xl">Requests</h1>
+      {requests.map((request) => {
         const { _id, firstName, lastName, age, gender, about, photoUrl } =
-          connection;
+          request?.fromUserId;
         return (
           <div
             key={_id}
-            className="flex items-center m-4 p-4 gap-10 bg-base-300 rounded-lg w-1/2"
+            className="flex items-center m-4 p-4 bg-base-300 rounded-lg w-1/2"
           >
             <div>
               <img
@@ -50,6 +48,10 @@ const Connections = () => {
               )}
               <p>{about}</p>
             </div>
+            <div>
+              <button className="btn btn-primary mx-2">Reject</button>
+              <button className="btn btn-secondary mx-2">Accept</button>
+            </div>
           </div>
         );
       })}
@@ -57,4 +59,4 @@ const Connections = () => {
   );
 };
 
-export default Connections;
+export default Requests;
