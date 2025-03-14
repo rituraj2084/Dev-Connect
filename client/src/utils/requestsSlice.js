@@ -5,8 +5,14 @@ const requestsSlice = createSlice({
   initialState: null,
   reducers: {
     addRequests: (state, action) => action.payload,
+    removeRequest: (state, action) => {
+      console.log('state: ', state);
+      console.log('action: ', action);
+      const newRequests = state.filter((user) => user._id !== action.payload);
+      return newRequests;
+    },
   },
 });
 
-export const { addRequests } = requestsSlice.actions;
+export const { addRequests, removeRequest } = requestsSlice.actions;
 export default requestsSlice.reducer;

@@ -2,22 +2,43 @@ import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addRequests } from '../utils/requestsSlice';
+import { addRequests, removeRequest } from '../utils/requestsSlice';
 
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
   const fetchRequests = async () => {
-    const res = await axios.get(BASE_URL + '/user/requests/received', {
-      withCredentials: true,
-    });
-    dispatch(addRequests(res?.data?.data));
+    try {
+      const res = await axios.get(BASE_URL + '/user/requests/received', {
+        withCredentials: true,
+      });
+      dispatch(addRequests(res?.data?.data));
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  const reviewRequest = async (status, _id) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + '/request/review/' + status + '/' + _id,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeRequest(_id));
+      fetchRequests();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchRequests();
   }, []);
+
   if (!requests) return;
-  if (requests.length == 0) return <div>No requests found!!</div>;
+  if (requests.length == 0)
+    return <div className="flex justify-center my-6">No requests found!!</div>;
 
   return (
     <div className="flex flex-col items-center my-10">
@@ -49,8 +70,18 @@ const Requests = () => {
               <p>{about}</p>
             </div>
             <div>
-              <button className="btn btn-primary mx-2">Reject</button>
-              <button className="btn btn-secondary mx-2">Accept</button>
+              <button
+                className="btn btn-primary mx-2"
+                onClick={() => reviewRequest('rejected', _id)}
+              >
+                Reject
+              </button>
+              <button
+                className="btn btn-secondary mx-2"
+                onClick={() => reviewRequest('accepted', _id)}
+              >
+                Accept
+              </button>
             </div>
           </div>
         );

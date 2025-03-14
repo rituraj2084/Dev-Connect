@@ -10,10 +10,16 @@ app.use(
   cors({
     origin: 'http://localhost:5173',
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // ✅ Ensure PATCH is allowed
+    allowedHeaders: ['Content-Type', 'Authorization'], // ✅ Ensure required headers are allowed
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
+
+// ✅ Manually handle preflight requests
+app.options('*', cors());
 
 const authRouter = require('./routes/auth');
 const profileRouter = require('./routes/profile');

@@ -24,7 +24,7 @@ const Body = () => {
       } else {
         navigate('/error');
       }
-      console.error(error);
+      // console.error(error);
     }
   };
   useEffect(() => {

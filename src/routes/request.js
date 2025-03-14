@@ -68,7 +68,7 @@ requestRouter.post(
           .json({ message: 'Inavalid status type: ' + status });
       }
       const connectionRequest = await ConnectionRequest.findOne({
-        _id: requestId,
+        fromUserId: requestId,
         toUserId: loggedInUser._id,
         status: 'interested',
       });
